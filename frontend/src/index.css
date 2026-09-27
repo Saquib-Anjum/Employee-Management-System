@@ -5,6 +5,9 @@
 }
 
 @layer utilities {
+  button{
+    @apply cursor-pointer
+  }
   /* Card styles */
   .card {
     @apply bg-white rounded-lg border border-slate-200/70;

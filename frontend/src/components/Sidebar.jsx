@@ -26,7 +26,7 @@ function Sidebar() {
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
-  const role = "" || "EMPLOYEE";
+  const role = "ADMIN" || "EMPLOYEE";
   const navItem = [
     {
       name: "Dashboard",
@@ -61,13 +61,17 @@ function Sidebar() {
       icon: SettingsIcon,
     },
   ];
+
+  function handleLogout(){
+    window.location.href="/login"
+  }
   const sidebarContent = (
     <>
       {/* Brand header */}
       <div className="px-5 pt-6 pb-5 border-b border-white/6">
         <div className="flex items-center justify-between">
           <div className="flex itmes-center gap-3">
-            <UserIcon className="text-white size-7" />
+            <UserIcon className="text-white size-8" />
             <div className="">
               <p className="font-semibold text-[13px] text-white tracking-wide">
                 {" "}
@@ -141,7 +145,9 @@ function Sidebar() {
 
       {/* logout */}
       <div className="p-3 border-r border-white/6">
-        <button className=" flex items-center gap-3 w-full px-3 py-2.5 rounded-md text-[13px] font-medium text-slate-400 hover:text-rose-400 hover:bg-rose-500/8 transition-all duration-150">
+        <button 
+        onClick={handleLogout}
+        className=" flex items-center gap-3 w-full px-3 py-2.5 rounded-md text-[13px] font-medium text-slate-400 hover:text-rose-400 hover:bg-rose-500/8 transition-all duration-150">
           <LogOutIcon className="w-[17px] h-[17px]" />
           <span className="">Log out</span>
         </button>
