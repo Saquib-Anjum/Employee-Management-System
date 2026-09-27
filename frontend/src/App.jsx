@@ -22,10 +22,10 @@ function App() {
 
           <Route path='/dashboard' element={<Dashboard/> } />
           <Route path='employees' element={ <Employees/>} />
-          <Route path='/addtendance' addtendance={<Attendance/> } />
+          <Route path='/attendance' addtendance={<Attendance/> } />
           <Route path='/leave' element={<Leave/> } />
           <Route path='/payslips' element={ <PrintPaySlips/>} />
-          <Route path='/settengs' element={<Settings/>} />
+          <Route path='/settings' element={<Settings/>} />
           
           </Route>
           <Route path='/print/:id' element={<PrintPaySlips/>}/>

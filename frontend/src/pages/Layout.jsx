@@ -1,10 +1,11 @@
 import React from 'react'
 import { Outlet } from 'react-router-dom'
+import Sidebar from '../components/Sidebar'
 
 function Layout() {
   return (
     <div className='h-screen bg-red'>
-    <p>Sidebar</p>
+    <Sidebar/>
     <main>
       <div>
         <Outlet/>
