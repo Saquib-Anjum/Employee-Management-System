@@ -22,7 +22,7 @@ function App() {
 
           <Route path='/dashboard' element={<Dashboard/> } />
           <Route path='employees' element={ <Employees/>} />
-          <Route path='/attendance' addtendance={<Attendance/> } />
+          <Route path='/attendance' element={<Attendance/> } />
           <Route path='/leave' element={<Leave/> } />
           <Route path='/payslips' element={ <PrintPaySlips/>} />
           <Route path='/settings' element={<Settings/>} />

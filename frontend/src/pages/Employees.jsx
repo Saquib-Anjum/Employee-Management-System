@@ -11,19 +11,17 @@ function Employees() {
   const [selectDepartment, setSelectDepartment] = useState("");
   const [editEmployee, setEditEmployee] = useState(null);
 
-  const [showCreateModal, setShowCreateModal] = useState(true);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+
 
   const fetchEmployees = useCallback(async () => {
     setLoading(true);
     setEmployeeData(
-      dummyEmployeeData.filter((ele) =>
-        selectDepartment ? ele.department == selectDepartment : ele,
-      ),
-    );
+      dummyEmployeeData.filter((ele) => selectDepartment ? ele.department === selectDepartment : ele ));
     setTimeout(() => {
       setLoading(false);
-    }, 700);
-  }, []);
+    }, 300);
+  }, [selectDepartment]);
   const filtered = employeeData.filter((emp, idx) =>
     `${emp.firstName} ${emp.lastName} ${emp.position}`
       .toLowerCase()
@@ -31,7 +29,10 @@ function Employees() {
   );
   useEffect(() => {
     fetchEmployees();
-  }, []);
+  }, [fetchEmployees]);
+
+  console.log(selectDepartment,"selected department");
+  console.log(employeeData,"selected Employee");
   return (
     <div className="animate-fade-in">
       {/* ---Header section--- */}
@@ -62,7 +63,7 @@ function Employees() {
         </div>
         <select
           name="departments"
-          id=""
+          
           value={selectDepartment}
           onChange={(e) => setSelectDepartment(e.target.value)}
           className="max-w-40"
