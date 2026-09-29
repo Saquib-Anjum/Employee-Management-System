@@ -55,9 +55,7 @@ function LeaveHistory({ leaves = [], isAdmin, onUpdate }) {
                 Status
               </th>
 
-              <th className="px-6 py-6 text-left">
-                Day Type
-              </th>
+             
 
               {isAdmin && (
                 <th className="px-6 py-6 text-center">
@@ -140,11 +138,7 @@ function LeaveHistory({ leaves = [], isAdmin, onUpdate }) {
                       </span>
                     </td>
 
-                    {/* Day Type */}
-                    <td className="px-6 py-6 text-slate-500">
-                      {ele.dayType || "-"}
-                    </td>
-
+                    
                     {/* Actions */}
                     {isAdmin && (
                       <td className="px-6 py-6">
