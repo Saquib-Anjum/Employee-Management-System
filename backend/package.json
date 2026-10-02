@@ -8,7 +8,9 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "server": "nodemon server.js",
+    "start": "node server.js",
+    "seed": "node seed.js"
   },
   "dependencies": {
     "axios": "^1.20.0",
@@ -16,10 +18,11 @@
     "cors": "^2.8.6",
     "dotenv": "^18.0.4",
     "express": "^5.2.1",
+    "inngest": "^4.21.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.10.3",
     "multer": "^2.4.0",
-    "nodemailer": "^10.0.12",
+    "nodemailer": "^10.0.13",
     "nodemon": "^3.1.14"
   }
 }
