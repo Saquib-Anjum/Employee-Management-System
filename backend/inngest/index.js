@@ -244,9 +244,7 @@ const leaveApplicationReminder = inngest.createFunction(
 // 11:30 AM IST every day
 //
 // Cron:
-// 0 0 6 * * *
-//
-// 06:00 UTC = 11:30 AM IST
+// TZ=Asia/Kolkata 30 11 * * *
 //
 // Purpose:
 // Find active employees who haven't checked in and aren't
@@ -257,11 +255,11 @@ const attendanceReminderCron = inngest.createFunction(
   {
     id: "attendance-reminder-cron",
     triggers: {
-      cron: "0 0 6 * * *",
+      cron: "TZ=Asia/Kolkata 30 11 * * *",
     },
   },
 
-  async ({ event, step }) => {
+  async ({ step }) => {
     // ----------------------------------------------------------
     // Step 1: Get today's date range in IST
     // ----------------------------------------------------------
@@ -311,9 +309,11 @@ const attendanceReminderCron = inngest.createFunction(
       const leaves = await leaveApplicationModel
         .find({
           status: "APPROVED",
+
           startDate: {
             $lte: new Date(today.endUTC),
           },
+
           endDate: {
             $gte: new Date(today.startUTC),
           },
