@@ -2,7 +2,7 @@ import 'dotenv/config';
 import connectDB from './config/db.js';
 import userModel from './models/userModel.js';
 import bcrypt from 'bcrypt'
-const temporaryPassword = "admin123";
+// const temporaryPassword = "password"; 
 async function registerAdmin(){
   try{
 const ADMIN_EMAIL =process.env.ADMIN_EMAIL;
@@ -27,10 +27,7 @@ const admin = await userModel.create({
   role:"ADMIN",
 });
 
-console.log("Admin usr created 🎃");
-console.log("\nemail",admin.email);
-console.log("passowrd: ",temporaryPassword);
-console.log("\nchange the password after login. ");
+
 process.exit(0);
   }catch(err){
     console.error("seed failed",err);

@@ -10,6 +10,10 @@ import attendanceRouter from "./routes/attendanceRoute.js";
 import leaveRouter from "./routes/leaveApplicationRoute.js";
 import payslipsRouter from "./routes/payslipsRoute.js";
 import dashboardRouter from "./routes/dashboardRouter.js";
+//inngest imports
+import { serve } from "inngest/express";
+import { inngest, functions } from "./inngest/index.js";
+
 const app = express();
 //middlewares
 dotenv.config();
@@ -23,8 +27,19 @@ app.use("/api/profile", profileRouter);
 app.use("/api/attendance", attendanceRouter);
 app.use("/api/leave", leaveRouter);
 app.use("/api/payslips", payslipsRouter);
-
-app.use("/api/dashboard", dashboardRouter);
+// =================================================================================
+// Set up the "/api/inngest" (recommended) routes with the serve handler
+// Inngest
+// Inngest endpoint:
+// /api/inngest
+app.use(
+  "/api/inngest",
+  serve({
+    client: inngest,
+    functions,
+  }),
+);
+//==================================================================================
 app.get("/", (req, res) => {
   res.json({
     success: true,
