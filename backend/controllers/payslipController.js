@@ -1,53 +1,83 @@
 import employeeModel from "../models/employeeModel.js";
 import payslipModel from "../models/payslipModel.js";
 
-//create payslip
-//POST /api/payslips
+// Create Payslip
+// POST /api/payslips
 async function createPayslip(req, res) {
   try {
     const { employeeId, month, year, basicSalary, allowances, deductions } =
       req.body;
 
-    if (!employeeId || !month || !year || !basicSalary) {
+    if (
+      !employeeId ||
+      !month ||
+      !year ||
+      basicSalary === undefined ||
+      basicSalary === null
+    ) {
       return res.status(400).json({
         error: "Missing fields",
       });
     }
-    const netSalary = (Number =
-      basicSalary + Number(allowances || 0) - Number(deductions || 0));
 
-    const payslip = await payslipModel({
+    const basic = Number(basicSalary);
+    const allowance = Number(allowances || 0);
+    const deduction = Number(deductions || 0);
+
+    if (
+      Number.isNaN(basic) ||
+      Number.isNaN(allowance) ||
+      Number.isNaN(deduction)
+    ) {
+      return res.status(400).json({
+        error: "Salary values must be valid numbers",
+      });
+    }
+
+    const netSalary = basic + allowance - deduction;
+
+    const payslip = await payslipModel.create({
       employeeId,
       month: Number(month),
       year: Number(year),
-      basicSalary: Number(basicSalary),
-      allowances: Number(allowances || 0),
-      deductions: Number(deductions || 0),
+      basicSalary: basic,
+      allowances: allowance,
+      deductions: deduction,
       netSalary,
     });
-    return res.json({
+
+    return res.status(201).json({
       success: true,
       data: payslip,
     });
   } catch (err) {
-    return res.json({
-      error: "Failed ",
+    console.error("Create Payslip Error:", err);
+
+    return res.status(500).json({
+      error: "Failed to create payslip",
+      message: err.message,
     });
   }
 }
 
-//get payslip
-//GET /api/payslips
-async function getPayslip() {
+// Get Payslips
+// GET /api/payslips
+async function getPayslip(req, res) {
   try {
     const session = req.session;
-    const isAdmin = session.roel === "ADMIN";
+
+    // Fixed: roel -> role
+    const isAdmin = session?.role === "ADMIN";
+
     if (isAdmin) {
-      const payslips = await payslipModel.find().populate("employeeId").sort({
-        createdAt: -1,
-      });
-      const data = payslips.map((ele) => {
-        const obj = ele.toObject();
+      const payslips = await payslipModel
+        .find()
+        .populate("employeeId")
+        .sort({ createdAt: -1 });
+
+      const data = payslips.map((payslip) => {
+        const obj = payslip.toObject();
+
         return {
           ...obj,
           id: obj._id.toString(),
@@ -55,53 +85,75 @@ async function getPayslip() {
           employeeId: obj.employeeId?._id?.toString(),
         };
       });
-      return res.json({
+
+      return res.status(200).json({
         data,
       });
-    } else {
-      const employee = await employeeModel.findOne({ userId: session.userId });
-      if (!employee) {
-        return res.status(404).json({
-          error: "employee not found",
-        });
-      }
-      const payslips = await payslipModel
-        .find({ employeeId: employee._id })
-        .sort({ createdAt: -1 });
-      return res.json({ data: payslips });
     }
+
+    // Employee
+    const employee = await employeeModel.findOne({
+      userId: session?.userId,
+    });
+
+    if (!employee) {
+      return res.status(404).json({
+        error: "Employee not found",
+      });
+    }
+
+    const payslips = await payslipModel
+      .find({
+        employeeId: employee._id,
+      })
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      data: payslips,
+    });
   } catch (err) {
-    return res.json({
-      error: "Failed ",
+    console.error("Get Payslip Error:", err);
+
+    return res.status(500).json({
+      error: "Failed to fetch payslips",
+      message: err.message,
     });
   }
 }
 
-//get payslipb by ID
-//POST /api/payslips
-async function getPayslipById() {
+// Get Payslip By ID
+// GET /api/payslips/:id
+async function getPayslipById(req, res) {
   try {
     const { id } = req.params;
+
     const payslip = await payslipModel
       .findById(id)
       .populate("employeeId")
       .lean();
+
     if (!payslip) {
       return res.status(404).json({
-        error: "Not Found",
+        error: "Payslip not found",
       });
     }
+
     const result = {
       ...payslip,
       id: payslip._id.toString(),
       employee: payslip.employeeId,
+      employeeId: payslip.employeeId?._id?.toString(),
     };
-    return res.json({
+
+    return res.status(200).json({
       data: result,
     });
   } catch (err) {
-    return res.json({
-      error: "Failed ",
+    console.error("Get Payslip By ID Error:", err);
+
+    return res.status(500).json({
+      error: "Failed to fetch payslip",
+      message: err.message,
     });
   }
 }

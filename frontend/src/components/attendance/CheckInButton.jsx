@@ -1,35 +1,65 @@
 import { Loader2, LogInIcon, LogOutIcon } from "lucide-react";
 import React, { useState } from "react";
+import toast from "react-hot-toast";
+import api from "../../api/axios";
 
-function CheckInButton({ todayRecords, onAtion }) {
+function CheckInButton({ todayRecords, onAction }) {
   const [loading, setLoading] = useState(false);
+
   const handleAttendance = async () => {
     setLoading(true);
-    setTimeout(() => {
+
+    try {
+      await api.post("/attendance");
+
+      toast.success(
+        todayRecords?.checkIn
+          ? "Checked out successfully"
+          : "Checked in successfully",
+      );
+
+      onAction?.();
+    } catch (err) {
+      console.error("Attendance error:", err);
+
+      toast.error(
+        err?.response?.data?.error ||
+          err?.response?.data?.message ||
+          err?.message ||
+          "Something went wrong",
+      );
+    } finally {
       setLoading(false);
-      onAtion();
-    }, 1000);
+    }
   };
+
+  // Work day completed
   if (todayRecords?.checkOut) {
     return (
       <div className="flex flex-col items-center justify-center p-8 bg-slate-50 rounded-xl border border-slate-200">
-        <h3 className=" text-lg font-bold text-slate-900">
-          Work Day Completed
-        </h3>
-        <p className="text-slate-500 text-sm-mt-1">
-          Great Job! See you tommorow
+        <h3 className="text-lg font-bold text-slate-900">Work Day Completed</h3>
+
+        <p className="text-slate-500 text-sm mt-1">
+          Great Job! See you tomorrow
         </p>
       </div>
     );
   }
-  const isCheckedIn = !!todayRecords?.isCheckedIn;
+
+  const isCheckedIn = !!todayRecords?.checkIn;
 
   return (
-    <div className="absolute bottom-4 right-4 flex-col flex z-1">
+    <div className="absolute bottom-4 right-4 flex flex-col z-10">
       <button
-      onClick={handleAttendance}
-      disabled={loading}
-      className={`w-full max-w-xs flex justify-between items-center gap-8 p-4 rounded-xl bg-linear-to-br text-white ${isCheckedIn?'from-slate-700 to-slate-900':'from-green-600 to-green-700'}`}>
+        type="button"
+        onClick={handleAttendance}
+        disabled={loading}
+        className={`w-full max-w-xs flex justify-between items-center gap-8 p-4 rounded-xl bg-gradient-to-br text-white transition-all disabled:opacity-70 ${
+          isCheckedIn
+            ? "from-slate-700 to-slate-900"
+            : "from-green-600 to-green-700"
+        }`}
+      >
         {loading ? (
           <Loader2 className="size-7 animate-spin" />
         ) : isCheckedIn ? (
@@ -37,12 +67,14 @@ function CheckInButton({ todayRecords, onAtion }) {
         ) : (
           <LogInIcon className="size-7" />
         )}
-        <div className="">
-          <h2 className="text-lg-font-medium mb-1">
-            {loading ? "Processing" : isCheckedIn ? "Clock Out" : "Clock"}
+
+        <div>
+          <h2 className="text-lg font-medium mb-1">
+            {loading ? "Processing..." : isCheckedIn ? "Clock Out" : "Clock In"}
           </h2>
+
           <p className="text-xs opacity-80">
-            {isCheckedIn ? "Click to end you shift" : "start your work day"}
+            {isCheckedIn ? "Click to end your shift" : "Start your work day"}
           </p>
         </div>
       </button>

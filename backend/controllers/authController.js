@@ -5,24 +5,28 @@ import generateToken from "../utils/generateToken.js";
 //POST /api/auth/login
 async function login(req, res) {
   try {
+   // console.log("LOGIN ROUTE HIT");
     const { email, password, role_type } = req.body;
     if (!email || !password) {
       return res.status(400).json({
         error: "Email and pasword are required",
       });
     }
+   // console.log("Finding user...");
     const user = await userModel.findOne({ email });
+      //  console.log("User:", user);
     if (!user) {
       return res.status(401).json({
         error: "Invalid credentials",
       });
     }
-    if (role_type === "admin" && user.role != admin) {
+    if (role_type === "admin" && user.role != "ADMIN") {
       return res.status(401).json({
         error: "not authorize as admin",
       });
     }
     const isValid = await bcrypt.compare(password, user.password);
+    //console.log(isValid)
     if (!isValid) {
       return res.status(401).json({
         error: "Invalid credentials",
@@ -43,14 +47,16 @@ async function login(req, res) {
 //get session for employee and admin;
 // GET /api/auth/session
 async function session( req , res){
+ // console.log("session hit")
  const session= req.session;
- res.json({
+ return res.json({
   user:session
  })
 }
 //change password for employee and admin;
 //POST /api/auth/change-password
 async function changePassword( req, res){
+ // console.log("change password api hitted")
   try{
    const session = req.session;
    const {currentPassword,newPassword} = req.body;

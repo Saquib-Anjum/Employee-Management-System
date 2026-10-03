@@ -8,9 +8,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const EmployeeDashboard = ({ dashboardData }) => {
-  console.log(dashboardData, "dashboard data");
+  //console.log(dashboardData, "dashboard data");
   const emp = dashboardData.employee;
-  console.log(emp);
+ // console.log(emp);
   const cards = [
     {
       icon: Calendar1Icon,

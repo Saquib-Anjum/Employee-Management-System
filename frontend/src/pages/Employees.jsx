@@ -3,6 +3,7 @@ import { DEPARTMENTS, dummyEmployeeData } from "../assets/assets";
 import { BriefcasePlus, PlusIcon, SearchIcon, X } from "lucide-react";
 import EmployeeCard from "../components/EmployeeCard";
 import EmployeeFrom from "../components/EmployeeFrom";
+import api from "../api/axios";
 
 function Employees() {
   const [employeeData, setEmployeeData] = useState([]);
@@ -15,12 +16,15 @@ function Employees() {
 
 
   const fetchEmployees = useCallback(async () => {
-    setLoading(true);
-    setEmployeeData(
-      dummyEmployeeData.filter((ele) => selectDepartment ? ele.department === selectDepartment : ele ));
-    setTimeout(() => {
+    try{
+      const url = selectDepartment?`/employee?department=${selectDepartment}`:"/employees";
+      const {data} = await api.get(url);
+      setEmployeeData(data.result ||[]);
+    }catch(err){
+  console.error("failed to fetch employee")
+    }finally{
       setLoading(false);
-    }, 300);
+    }
   }, [selectDepartment]);
   const filtered = employeeData.filter((emp, idx) =>
     `${emp.firstName} ${emp.lastName} ${emp.position}`
@@ -31,8 +35,8 @@ function Employees() {
     fetchEmployees();
   }, [fetchEmployees]);
 
-  console.log(selectDepartment,"selected department");
-  console.log(employeeData,"selected Employee");
+  //console.log(selectDepartment,"selected department");
+  //console.log(employeeData,"selected Employee");
   return (
     <div className="animate-fade-in">
       {/* ---Header section--- */}

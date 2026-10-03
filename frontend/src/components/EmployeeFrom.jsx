@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DEPARTMENTS } from "../assets/assets";
 import { Loader } from "lucide-react";
+import api from "../api/axios";
+import toast from "react-hot-toast";
 
 const EmployeeFrom = ({ initialData, onSuccess, onCancel }) => {
   const navigate = useNavigate();
@@ -9,8 +11,28 @@ const EmployeeFrom = ({ initialData, onSuccess, onCancel }) => {
   const isEditMode = !!initialData;
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    const formData = new FormData(e.currentTarget);
+    if (isEditMode) {
+      const password = formData.get("password");
+      if (!password) {
+        formData.delete("password");
+      }
+    }
+
+    try {
+      const url = isEditMode ? `/employees/${initialData.id}` : "/employees";
+      const method = isEditMode ? "put" : "post";
+      await api[method](url, formData);
+      onSuccess ? onSuccess() : navigate("/employees");
+    } catch (err) {
+      console.log(err)
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
-  console.log(initialData, "initialData");
+  //console.log(initialData, "initialData");
   return (
     <form
       onSubmit={handleSubmit}
@@ -165,7 +187,6 @@ const EmployeeFrom = ({ initialData, onSuccess, onCancel }) => {
               <select
                 name="employmentStatus"
                 required
-                
                 defaultValue={initialData?.employmentStatus}
               >
                 <option value="ACTIVE">Active</option>
@@ -176,11 +197,9 @@ const EmployeeFrom = ({ initialData, onSuccess, onCancel }) => {
         </div>
       </div>
 
-
-
       {/* Account setup */}
 
-       <div className="card p-5 sm:p-6">
+      <div className="card p-5 sm:p-6">
         <h3 className=" text-base font-medium mb-6 pb-4 border-b border-slate-100">
           Account Setup
         </h3>
@@ -197,49 +216,38 @@ const EmployeeFrom = ({ initialData, onSuccess, onCancel }) => {
             />
           </div>
 
-         {
-          !isEditMode && (
-              <div >
+          {!isEditMode && (
+            <div>
+              <label htmlFor="" className="block mb-2">
+                Temporary Password
+              </label>
+              <input type="password" name="password" required />
+            </div>
+          )}
+
+          {isEditMode && (
+            <div>
+              <label htmlFor="" className="block mb-2">
+                Change Password (optional)
+              </label>
+              <input
+                type="password"
+                name="password"
+                
+                placeholder="Leave blank to keep current"
+              />
+            </div>
+          )}
+          <div>
             <label htmlFor="" className="block mb-2">
-              Temporary Password
+              System Role
             </label>
-            <input
-              type="password"
-              name="password"
-              required
-             
-            />
-          </div>
-          )
-         }
-         
-         {
-          isEditMode && (
-              <div >
-            <label htmlFor="" className="block mb-2">
-            Change Password (optional)
-            </label>
-            <input
-              type="password"
-              name="password"
-              required
-              placeholder="Leave blank to keep current"
-             
-            />
-          </div>
-          )
-         }
-          <div >
-            <label htmlFor="" className="block mb-2">
-            System Role
-            </label>
-            <select name="role"
-            defaultValue={initialData?.user.role||"EMPLOYEE" }
-                      
+            <select
+              name="role"
+              defaultValue={initialData?.user.role || "EMPLOYEE"}
             >
               <option value="EMPLOYEE">Employee</option>
               <option value="ADMIN">Admin</option>
-
             </select>
           </div>
         </div>
@@ -248,14 +256,21 @@ const EmployeeFrom = ({ initialData, onSuccess, onCancel }) => {
       {/* Buttons */}
       <div className="flex flex-col-reversse sm:flex-row justify-end gap-3 pt-2">
         <button
-        onClick={()=>onCancel?onCancel():navigate(-1)}
-        type="button" className="btn-secondary">Cancel</button>
+          onClick={() => (onCancel ? onCancel() : navigate(-1))}
+          type="button"
+          className="btn-secondary"
+        >
+          Cancel
+        </button>
 
-        <button type="submit" 
-        disabled={loading}
-        className="btn-primary flex items-center justify-center">{loading && <Loader className="w-4 h-4 animate-spin mr-2"/>}
-        {isEditMode?"Update Employee":"Create Employee"}</button>
-
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn-primary flex items-center justify-center"
+        >
+          {loading && <Loader className="w-4 h-4 animate-spin mr-2" />}
+          {isEditMode ? "Update Employee" : "Create Employee"}
+        </button>
       </div>
     </form>
   );
