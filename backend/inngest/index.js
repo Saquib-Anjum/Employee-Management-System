@@ -11,6 +11,7 @@ import sendEmail from "../config/nodemailer.js";
 // Create an Inngest client for the Employee Management System
 export const inngest = new Inngest({
   id: "ems",
+  eventKey: process.INNGEST_EVENT_KEY,
 });
 
 // ============================================================

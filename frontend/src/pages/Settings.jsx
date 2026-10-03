@@ -4,21 +4,32 @@ import { Lock } from "lucide-react";
 import Loading from "../components/Loading";
 import ProfileForm from "../components/settings/ProfileForm";
 import ChangePasswordModal from "../components/settings/ChangePasswordModal";
+import { useAuth } from "../context/AuthContext";
+import toast from "react-hot-toast";
+import api from "../api/axios";
 function Settings() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-
+const {user} = useAuth();
   const fetchProfile = async () => {
-    setProfile(dummyProfileData);
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+try{
+const res = await api.get('/profile');
+const profile = res.data;
+if(profile){
+  setProfile(profile);
+}
+}catch(err){
+toast.error(err.message);
+}finally{
+setLoading(false)
+}
+
   };
 
   useEffect(() => {
     fetchProfile();
-  }, [fetchProfile]);
+  }, [user]);
   if (loading) return <Loading />;
   return (
     <div className="animate-fade-in">

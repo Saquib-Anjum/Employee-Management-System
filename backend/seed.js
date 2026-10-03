@@ -2,7 +2,7 @@ import 'dotenv/config';
 import connectDB from './config/db.js';
 import userModel from './models/userModel.js';
 import bcrypt from 'bcrypt'
-// const temporaryPassword = "password"; 
+ const temporaryPassword = "password"; 
 async function registerAdmin(){
   try{
 const ADMIN_EMAIL =process.env.ADMIN_EMAIL;

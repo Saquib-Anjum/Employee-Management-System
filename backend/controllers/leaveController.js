@@ -199,7 +199,7 @@ async function updateLeave(req, res) {
         error: "Only admin can update leave status",
       });
     }
-
+   // console.log(req.body,"status ")
     const { status } = req.body;
 
     // Validate status

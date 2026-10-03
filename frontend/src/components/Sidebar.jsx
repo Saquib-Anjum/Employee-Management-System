@@ -7,6 +7,7 @@ import {
   DollarSignIcon,
   FileTextIcon,
   LayoutGridIcon,
+  Loader2,
   LogOutIcon,
   MenuIcon,
   Settings,
@@ -14,19 +15,26 @@ import {
   UserIcon,
   XIcon,
 } from "lucide-react";
+import { useAuth } from "../context/AuthContext.jsx";
+import api from "../api/axios.js";
 function Sidebar() {
   const { pathname } = useLocation();
   const [userName, setUserName] = useState("");
   const [mobileOpen, setMobileOpen] = useState(false);
+  const {user,loading,logout} = useAuth()
 
   useEffect(() => {
-    setUserName(dummyProfileData.firstName + " " + dummyProfileData.lastName);
+   api.get('/profile').then(({data})=>{
+    if(data.firstName) setUserName(`${data.firstName} ${data.lastName}` ||"".trim())
+   })
+
+   
   }, []);
 
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
-  const role = "" || "EMPLOYEE";
+  const role = user?.role;
   const navItem = [
     {
       name: "Dashboard",
@@ -62,7 +70,8 @@ function Sidebar() {
     },
   ];
 
-  function handleLogout(){
+ async function handleLogout(){
+   await logout();
     window.location.href="/login"
   }
   const sidebarContent = (
@@ -120,7 +129,10 @@ function Sidebar() {
       </div>
       {/* navigation items */}
       <div className=" flex-1 px-3 space-y-0.5 overflow-y-auto">
-        {navItem.map((ele, idx) => {
+        {loading?(<div className="px-3 py-3 flex items-center gap-3 text-slate-500"><Loader2 className="animate-spin w-4 h-4"/>
+        <p>loading....</p></div>):(
+          
+          navItem.map((ele, idx) => {
           const isActive = pathname.startsWith(ele.path);
           return (
             <Link
@@ -140,7 +152,9 @@ function Sidebar() {
               )}
             </Link>
           );
-        })}
+        })
+        )}
+        
       </div>
 
       {/* logout */}

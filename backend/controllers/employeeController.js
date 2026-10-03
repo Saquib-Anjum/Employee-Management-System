@@ -50,6 +50,7 @@ export const getEmployees = async (req, res) => {
 // CREATE EMPLOYEE
 // POST /api/employees
 export const createEmployee = async (req, res) => {
+  //console.log("create employee ... ")
   try {
     const {
       firstName,
@@ -149,6 +150,7 @@ export const createEmployee = async (req, res) => {
 // PUT /api/employees/:id
 
 export const updateEmployee = async (req, res) => {
+  console.log('update employee')
   try {
     const { id } = req.params;
 

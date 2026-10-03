@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { format } from "date-fns";
 import { CheckIcon, Loader, X } from "lucide-react";
+import api from "../../api/axios";
+import toast from "react-hot-toast";
 
 function LeaveHistory({ leaves = [], isAdmin, onUpdate }) {
   const [processing, setProcessing] = useState(null);
@@ -9,11 +11,12 @@ function LeaveHistory({ leaves = [], isAdmin, onUpdate }) {
     setProcessing(id);
 
     try {
-      if (onUpdate) {
-        await onUpdate(id, status);
-      }
+      await api.patch(`/leave/${id}`,{status});
+      // if (onUpdate) {
+      //   await onUpdate(id, status);
+      // }
     } catch (error) {
-      console.error("Failed to update leave status:", error);
+      toast.error(err?.response?.data?.error||err.message);
     } finally {
       setProcessing(null);
     }

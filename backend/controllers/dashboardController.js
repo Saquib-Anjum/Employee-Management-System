@@ -20,7 +20,7 @@ async function getDashboard(req, res) {
               $lt: new Date(new Date().setHours(24, 0, 0, 0)),
             },
           }),
-          leaveApplicationModel.countDocumens({ status: "PENDING" }),
+          leaveApplicationModel.countDocuments({ status: "PENDING" }),
         ]);
       return res.json({
         role: "ADMIN",
@@ -40,31 +40,37 @@ async function getDashboard(req, res) {
         });
       }
       const today = new Date();
-      const [currentMonthAttendance,pendingLeaves,latestPayslip] = await Promise.all([
-        attendanceModel.countDocuments({
-          employeeId: employee._id,
-          date: {
-            $gte: new Date(today.getFullYear(), today.getMonth(), 1),
-            $lt: new Date(today.getFullYear(), today.getMonth() + 1, 1),
-          },
-        }),
-        leaveApplicationModel.countDocuments({
-          employeeId:employee._id,
-          status:"PENDING"
-        }),
-        payslipModel.findOne({employeeId:employee._id}).sort({createdAt:-1}).lean(),
-      ]);
+      const [currentMonthAttendance, pendingLeaves, latestPayslip] =
+        await Promise.all([
+          attendanceModel.countDocuments({
+            employeeId: employee._id,
+            date: {
+              $gte: new Date(today.getFullYear(), today.getMonth(), 1),
+              $lt: new Date(today.getFullYear(), today.getMonth() + 1, 1),
+            },
+          }),
+          leaveApplicationModel.countDocuments({
+            employeeId: employee._id,
+            status: "PENDING",
+          }),
+          payslipModel
+            .findOne({ employeeId: employee._id })
+            .sort({ createdAt: -1 })
+            .lean(),
+        ]);
 
       res.json({
-        role:"EMPLOYEE",
-        employee:{
+        role: "EMPLOYEE",
+        employee: {
           ...employee,
-          id:employee._id.toString()
+          id: employee._id.toString(),
         },
         currentMonthAttendance,
         pendingLeaves,
-        latestPayslip:latestPayslip?{...latestPayslip,id:latestPayslip._id.toString()}:null,
-      })
+        latestPayslip: latestPayslip
+          ? { ...latestPayslip, id: latestPayslip._id.toString() }
+          : null,
+      });
     }
   } catch (err) {
     console.error("Dashboard", err);
@@ -74,4 +80,4 @@ async function getDashboard(req, res) {
   }
 }
 
-export {getDashboard}
+export { getDashboard };
