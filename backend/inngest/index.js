@@ -266,11 +266,24 @@ const attendanceReminderCron = inngest.createFunction(
     // ----------------------------------------------------------
 
     const today = await step.run("get-today-date", () => {
-      const startUTC = new Date(
-        new Date().toLocaleString("en-CA", {
-          timeZone: "Asia/Kolkata",
-        }) + "T00:00:00+05:30",
-      );
+      const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: "Asia/Kolkata",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).formatToParts(new Date());
+
+      const dateParts = {};
+
+      for (const part of parts) {
+        if (part.type !== "literal") {
+          dateParts[part.type] = part.value;
+        }
+      }
+
+      const dateString = `${dateParts.year}-${dateParts.month}-${dateParts.day}`;
+
+      const startUTC = new Date(`${dateString}T00:00:00+05:30`);
 
       const endUTC = new Date(startUTC.getTime() + 24 * 60 * 60 * 1000);
 
@@ -279,7 +292,6 @@ const attendanceReminderCron = inngest.createFunction(
         endUTC: endUTC.toISOString(),
       };
     });
-
     // ----------------------------------------------------------
     // Step 2: Get all active and non-deleted employees
     // ----------------------------------------------------------
