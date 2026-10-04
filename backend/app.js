@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-
+import connectDB from "./config/db.js";
 import multer from "multer";
 import authRouter from "./routes/authRoute.js";
 import employeeRouter from "./routes/employeeRoute.js";
@@ -20,11 +20,21 @@ dotenv.config();
 app.use(express.json());
 app.use(cors());
 app.use(multer().none());
+// Ensure DB is connected on every request (including /api/inngest)
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    console.error("DB connection failed:", err);
+    res.status(500).json({ error: "Database connection failed" });
+  }
+});
 //route
 app.use("/api/auth", authRouter);
 app.use("/api/employees", employeeRouter);
 app.use("/api/profile", profileRouter);
-app.use('/api/dashboard',dashboardRouter)
+app.use("/api/dashboard", dashboardRouter);
 app.use("/api/attendance", attendanceRouter);
 app.use("/api/leave", leaveRouter);
 app.use("/api/payslips", payslipsRouter);
