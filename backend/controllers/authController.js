@@ -56,7 +56,7 @@ async function session( req , res){
 //change password for employee and admin;
 //POST /api/auth/change-password
 async function changePassword( req, res){
- // console.log("change password api hitted")
+ console.log("change password api hitted")
   try{
    const session = req.session;
    const {currentPassword,newPassword} = req.body;
@@ -79,9 +79,8 @@ error:"Both password are required"
     })
   }
   const hashed = await bcrypt.hash(newPassword,10);
-  await userModel.findByIdAndUpdate(session.userId,{
-    hashed
-  })
+  user.password = hashed;
+  await user.save();
 return  res.json({
   success:true
 })
