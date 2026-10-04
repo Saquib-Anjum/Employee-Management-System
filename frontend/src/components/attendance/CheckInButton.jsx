@@ -7,18 +7,24 @@ function CheckInButton({ todayRecords, onAction }) {
   const [loading, setLoading] = useState(false);
 
   const handleAttendance = async () => {
+    if (loading) return;
+
     setLoading(true);
 
     try {
-      await api.post("/attendance");
+      const { data } = await api.post("/attendance");
+
+      console.log("Attendance action response:", data);
+
+      const isCheckout = data?.type === "CHECK_OUT";
 
       toast.success(
-        todayRecords?.checkIn
-          ? "Checked out successfully"
-          : "Checked in successfully",
+        isCheckout ? "Checked out successfully" : "Checked in successfully",
       );
 
-      onAction?.();
+      // IMPORTANT:
+      // Wait for parent to fetch the latest attendance record
+      await onAction?.();
     } catch (err) {
       console.error("Attendance error:", err);
 
@@ -46,7 +52,7 @@ function CheckInButton({ todayRecords, onAction }) {
     );
   }
 
-  const isCheckedIn = !!todayRecords?.checkIn;
+  const isCheckedIn = Boolean(todayRecords?.checkIn);
 
   return (
     <div className="absolute bottom-4 right-4 flex flex-col z-10">
@@ -60,6 +66,7 @@ function CheckInButton({ todayRecords, onAction }) {
             : "from-green-600 to-green-700"
         }`}
       >
+        {/* Icon */}
         {loading ? (
           <Loader2 className="size-7 animate-spin" />
         ) : isCheckedIn ? (
@@ -68,6 +75,7 @@ function CheckInButton({ todayRecords, onAction }) {
           <LogInIcon className="size-7" />
         )}
 
+        {/* Text */}
         <div>
           <h2 className="text-lg font-medium mb-1">
             {loading ? "Processing..." : isCheckedIn ? "Clock Out" : "Clock In"}
